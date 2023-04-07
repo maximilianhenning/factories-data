@@ -69,7 +69,7 @@ company_list = ["Adidas", "ASICS", "ASOS", "CandA", "Debenhams", "Esprit", "GAP"
                 "KappAhl", "New_Balance", "Levi_Strauss", "PVH", "Tesco", "UNIQLO"]
 
 # Function to export final dataframes and export as CSV
-def export_final(company_df, company, feature):
+def export_company(company_df, company, feature):
     for column in company_df.columns:
         if company in column:
             company_df = company_df[["geocode_name", column, "lat", "lon"]].rename(columns = {column: feature})
@@ -91,7 +91,8 @@ for column in worker_df.columns:
 if not path.exists(path.join(dir, feature)):
     makedirs(path.join(dir, feature))
 for company in company_list:
-    export_final(worker_df, company, feature)
+    export_company(worker_df, company, feature)
+# Create combined dataframe out of all others and export that
 
 # Has factories
 factory_df = df
@@ -104,4 +105,5 @@ for column in factory_df.columns:
 if not path.exists(path.join(dir, feature)):
     makedirs(path.join(dir, feature))
 for company in company_list:
-    export_final(factory_df, company, feature)
+    export_company(factory_df, company, feature)
+# Create combined dataframe out of all others and export that
