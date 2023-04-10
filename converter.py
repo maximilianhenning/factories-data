@@ -9,6 +9,24 @@ complete_df["factory_parent_different"].replace({0: "no", 1: "yes"}, inplace = T
 complete_df["EPZ"].replace({0: "no", 1: "yes"}, inplace = True)
 complete_df["Product_Categories_grp"].replace({0: "rest", 1: "accessories", 2: "footwear"}, inplace = True)
 complete_df["City_factory"] = complete_df["City_factory"].str.lower()
+country_dict = {36: "Australia", 50: "Bangladesh",
+                52: "Barbados", 56: "Belgium", 92: "Virgin Islands, British",
+                104: "Myanmar", 116: "Cambodia", 124: "Canada", 144: "Sri Lanka",
+                156: "China", 158: "Taiwan", 170: "Colombia", 208: "Denmark",
+                222: "El Salvador", 231: "Ethiopia", 246: "Finland", 250: "France",
+                276: "Germany", 320: "Guatemala", 340: "Honduras", 344: "Hong Kong",
+                356: "India", 360: "Indonesia", 372: "Ireland", 376: "Israel",
+                380: "Italy", 392: "Japan", 400: "Jordan", 410: "Korea", 
+                458: "Malaysia", 484: "Mexico", 504: "Morocco", 512: "Oman",
+                528: "Netherlands", 586: "Pakistan", 604: "Peru",
+                608: "Philippines", 620: "Portugal", 642: "Romania",
+                643: "Russia", 702: "Singapore", 704: "Vietnam", 724: "Spain",
+                752: "Sweden", 756: "Switzerland", 764: "Thailand",
+                784: "UAE", 788: "Tunisia", 792: "Turkey", 818: "Egypt",
+                826: "UK", 840: "USA", 850: "Virgin Islands, American"
+                }
+complete_df["countrycode"].replace(country_dict, inplace = True)
+complete_df["country_parent_num"].replace(country_dict, inplace = True)
 complete_df["Province_State_factory"] = complete_df["Province_State_factory"].str.lower()
 for column in complete_df.columns:
     if not "DICH" in column:
@@ -18,6 +36,8 @@ for column in complete_df.columns:
         complete_df[column].replace({-9: 0, 0: float("nan"), 1: 500, 2: 2500, 3: 7500}, inplace = True)
         # Maximum numbers
         #complete_df[column].replace({-9: 0, 0: float("nan"), 1: 1000, 2: 5000, 3: 10000}, inplace = True)
+complete_df.to_csv(path.join(dir, "data.csv"), sep = ";", encoding = "utf-8", index = False)
+print("data saved")
 
 df = complete_df.drop(columns = ["Parent_companies_name", "Country_parent", "Address_1_factory", "Address_2_factory", "Address_3_factory",
                        "Zip_Code_factory", "countrycode", "country_parent_num", "factory_parent_different", "ownership_grp", 
