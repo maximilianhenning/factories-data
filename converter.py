@@ -12,18 +12,18 @@ complete_df["City_factory"] = complete_df["City_factory"].str.lower()
 country_dict = {36: "Australia", 50: "Bangladesh",
                 52: "Barbados", 56: "Belgium", 92: "Virgin Islands, British",
                 104: "Myanmar", 116: "Cambodia", 124: "Canada", 144: "Sri Lanka",
-                156: "China", 158: "Taiwan", 170: "Colombia", 208: "Denmark",
+                156: "China", 158: "Taiwan, China", 170: "Colombia", 208: "Denmark",
                 222: "El Salvador", 231: "Ethiopia", 246: "Finland", 250: "France",
-                276: "Germany", 320: "Guatemala", 340: "Honduras", 344: "Hong Kong",
+                276: "Germany", 320: "Guatemala", 340: "Honduras", 344: "Hong Kong, China",
                 356: "India", 360: "Indonesia", 372: "Ireland", 376: "Israel",
-                380: "Italy", 392: "Japan", 400: "Jordan", 410: "Korea", 
+                380: "Italy", 392: "Japan", 400: "Jordan", 410: "Korea, Republic of", 
                 458: "Malaysia", 484: "Mexico", 504: "Morocco", 512: "Oman",
                 528: "Netherlands", 586: "Pakistan", 604: "Peru",
                 608: "Philippines", 620: "Portugal", 642: "Romania",
                 643: "Russia", 702: "Singapore", 704: "Vietnam", 724: "Spain",
                 752: "Sweden", 756: "Switzerland", 764: "Thailand",
-                784: "UAE", 788: "Tunisia", 792: "Turkey", 818: "Egypt",
-                826: "UK", 840: "USA", 850: "Virgin Islands, American"
+                784: "United Arab Emirates", 788: "Tunisia", 792: "Turkey", 818: "Egypt",
+                826: "United Kingdom", 840: "United States", 850: "Virgin Islands, American"
                 }
 complete_df["countrycode"].replace(country_dict, inplace = True)
 complete_df["country_parent_num"].replace(country_dict, inplace = True)
@@ -37,15 +37,17 @@ for column in complete_df.columns:
         # Maximum numbers
         #complete_df[column].replace({-9: 0, 0: float("nan"), 1: 1000, 2: 5000, 3: 10000}, inplace = True)
 complete_df.to_csv(path.join(dir, "data.csv"), sep = ";", encoding = "utf-8", index = False)
-print("data saved")
 
 df = complete_df.drop(columns = ["Parent_companies_name", "Country_parent", "Address_1_factory", "Address_2_factory", "Address_3_factory",
                        "Zip_Code_factory", "countrycode", "country_parent_num", "factory_parent_different", "ownership_grp", 
                        "TOTAL_BRANDS16", "TOTAL_BRANDS16_dich", "femployees_p_factory", "EPZ"])
+country_list = ["CN", "IN"]
 cities_to_be_coded_list = list(set(df["City_factory"].tolist()))
 cities_to_be_coded_list = [city for city in cities_to_be_coded_list]
 
+country_list = complete_df["countrycode"].tolist()
 geocode_df = pd.read_csv(path.join(dir, "geocode.csv"), sep = ";", encoding = "utf-8")
+geocode_df = geocode_df.loc[geocode_df["Country name EN"].isin(country_list)]
 cities_names_list = geocode_df["Name"].tolist()
 cities_names_list = [city.lower() for city in cities_names_list]
 cities_alternate_names_list = geocode_df["Alternate Names"].tolist()
@@ -78,7 +80,6 @@ def city_encoder(city):
         row = geocode_df.loc[geocode_df["Name"].str.lower() == geocodable_entry]
     elif geocodable_entry in cities_alternate_names_list:
         row = geocode_df.loc[geocode_df["Alternate Names"].str.lower().str.contains(geocodable_entry, na = False)]
-    #geocode = row["Geoname ID"].values[0]
     coordinates = row["Coordinates"].values[0]
     return ", ".join([geocodable_entry, coordinates])
 df[["geocode_name", "lat", "lon"]] = df["City_factory"].apply(city_encoder).str.split(", ", expand = True)
